@@ -12,6 +12,8 @@ struct particle
 {
 	float3 pos;
 	float3 vel;
+	float4 color;
+	float life;
 };
 RWStructuredBuffer<particle> Output : BACKBUFFER;
 
@@ -34,7 +36,7 @@ void CSConstantForce( uint3 DTid : SV_DispatchThreadID )
 	// write position and velocity of emitted particles:
 	Output[index].vel = v;
 	Output[index].pos = p;
-	
+	Output[index].life = 0;
 }
 
 //==============================================================================

@@ -9,6 +9,8 @@ float bounce = 1;
 //Reset Position (xyz) and random damping (w)
 StructuredBuffer<float4> resetData;
 
+StructuredBuffer<float4> Color;
+
 //ATTRACTORS:
 float4x4 attrForceT;
 //Attractors Position Buffer
@@ -25,6 +27,8 @@ struct particle
 {
 	float3 pos;
 	float3 vel;
+	float4 color;
+	float life;
 };
 RWStructuredBuffer<particle> Output : BACKBUFFER;
 
@@ -39,8 +43,8 @@ void CSConstantForce( uint3 DTid : SV_DispatchThreadID )
 	{
 		Output[DTid.x].pos = resetData[DTid.x].xyz;
 		Output[DTid.x].vel = 0;
+		Output[DTid.x].life = 0;
 	}
-
 	else
 	{
 		float3 p = Output[DTid.x].pos;
@@ -75,13 +79,6 @@ void CSConstantForce( uint3 DTid : SV_DispatchThreadID )
 		float3 brwnForce = rndDir[rndIndex];
 		v += brwnForce * brwnStrenght;
 		
-		//Ground:
-//		if(p.y < 0) 
-//		{
-//			v = reflect(v, float3(0,1,0));
-//			v.y *= bounce;
-//			p.y = abs(p.y);
-//		}
 		//Bounce Smoother:
 		//get the y space from 0 to 0.1 and use it attenuate gravity
 		float bounceSmooth = saturate(p.y*10);  
@@ -89,6 +86,10 @@ void CSConstantForce( uint3 DTid : SV_DispatchThreadID )
 
 		Output[DTid.x].vel = v;
 		Output[DTid.x].pos = p + v;
+		Output[DTid.x].color = Color[Output[DTid.x].life];
+		//Output[DTid.x].color = Color[length(Output[DTid.x].vel) * 5000];
+		//Output[DTid.x].color = float4(1,1,1,1);
+		Output[DTid.x].life++;
 	}
 }
 

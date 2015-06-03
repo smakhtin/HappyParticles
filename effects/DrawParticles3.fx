@@ -15,6 +15,8 @@ struct particle
 {
 	float3 pos;
 	float3 vel;
+	float4 color;
+	float life;
 };
 StructuredBuffer<particle> pData;
 
@@ -66,7 +68,9 @@ vs2ps VS(VS_IN input)
 	float3 v = pData[input.iv].vel;
 	
     Out.PosWVP = float4(p,1);// mul(float4(po.xyz,1),tVP);
-	Out.Vcol = float4(saturate(v * velColMult)+0.5,1);
+	//Out.Vcol = float4(saturate(v * velColMult)+0.5,1);
+	Out.Vcol = pData[input.iv].color;
+	//Out.Vcol = float4(1,1,1,1);
 	
     return Out;
 }
